@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "tonic-prost-kotlin"
+
