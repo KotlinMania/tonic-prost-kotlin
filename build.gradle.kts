@@ -199,7 +199,11 @@ kotlin {
         binaries.framework { baseName = "TonicProst"; xcf.add(this) }
     }
     iosSimulatorArm64 {
-        binaries.framework { baseName = "TonicProst"; xcf.add(this) }
+        binaries.framework {
+            baseName = "TonicProst"
+            isStatic = true
+            xcf.add(this)
+        }
     }
     iosX64 {
         binaries.framework { baseName = "TonicProst"; xcf.add(this) }
