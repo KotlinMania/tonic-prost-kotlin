@@ -206,7 +206,11 @@ kotlin {
         }
     }
     iosX64 {
-        binaries.framework { baseName = "TonicProst"; xcf.add(this) }
+        binaries.framework {
+            baseName = "TonicProst"
+            isStatic = true
+            xcf.add(this)
+        }
     }
 
     tvosArm64 {
