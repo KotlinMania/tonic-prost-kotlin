@@ -212,6 +212,7 @@ kotlin {
     iosX64 {
         binaries.framework {
             baseName = "TonicProst"
+            isStatic = true
             xcf.add(this)
         }
     }
