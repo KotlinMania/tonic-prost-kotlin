@@ -199,8 +199,13 @@ kotlin {
         binaries.framework { baseName = "TonicProst"; xcf.add(this) }
     }
     iosSimulatorArm64 {
+       // iOS Simulator targets share an XCFramework "fat" stage that
+        // requires every input framework to be either all static or all
+        // dynamic. iosSimulatorArm64 is already declared static for the
+        // Swift Export SPM bridge, so iosX64 must match.
         binaries.framework {
             baseName = "TonicProst"
+            isStatic = true
             xcf.add(this)
         }
     }
