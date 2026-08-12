@@ -264,30 +264,11 @@ kotlin {
     val xcf = XCFramework(frameworkName)
     val frameworkBundleId = projectNamespace
 
-    macosArm64 {
-        binaries.framework { baseName = "TonicProst"; xcf.add(this) }
-    }
-    iosArm64 {
-        // iOS frameworks (device + simulators) must all be either static or
-        // dynamic for XCFramework fat binary creation. Using static to match
-        // the Swift Export SPM bridge requirement.
+    // Local helper: attach this target's framework to the XCFramework.
+    fun KotlinNativeTarget.addToXcf(static: Boolean = false) {
         binaries.framework {
-            baseName = "TonicProst"
-            isStatic = true
-            xcf.add(this)
-        }
-    }
-    iosSimulatorArm64 {
-        binaries.framework {
-            baseName = "TonicProst"
-            isStatic = true
-            xcf.add(this)
-        }
-    }
-    iosX64 {
-        binaries.framework {
-            baseName = "TonicProst"
-            isStatic = true
+            baseName = frameworkName
+            if (static) isStatic = true
             xcf.add(this)
             binaryOption("bundleId", frameworkBundleId)
         }
@@ -295,7 +276,12 @@ kotlin {
 
     // Apple — Tier 1/2 targets
     macosArm64 { addToXcf() }
-    iosArm64 { addToXcf(static = true) }
+    iosArm64 {
+        // iOS frameworks (device + simulators) must all be either static or
+        // dynamic for XCFramework fat binary creation. Using static to match
+        // the Swift Export SPM bridge requirement.
+        addToXcf(static = true)
+    }
     iosSimulatorArm64 { addToXcf(static = true) }
     tvosArm64 { addToXcf() }
     tvosSimulatorArm64 { addToXcf() }
@@ -373,8 +359,6 @@ kotlin {
         }
     }
 }
-
-
 
 // ============================================================================
 // Test logging
