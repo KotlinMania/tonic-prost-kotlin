@@ -64,10 +64,6 @@ public class Status(
             internal(error.message ?: "Protobuf decode error")
     }
 
-    public fun code(): Code = code
-
-    public fun message(): String = message
-
     override fun toString(): String = "Status(code=$code, message='$message')"
 
     override fun equals(other: Any?): Boolean =
@@ -92,8 +88,9 @@ public data class BufferSettings(
  * Buffer used during encoding of protobuf payloads.
  */
 public class EncodeBuf(
-    private val buffer: ArrayList<Byte> = ArrayList(),
+    initialCapacity: Int = 32,
 ) {
+    private val buffer: ArrayList<Byte> = ArrayList(initialCapacity)
     public fun put(bytes: ByteArray) {
         for (b in bytes) {
             buffer.add(b)
