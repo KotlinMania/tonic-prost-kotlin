@@ -160,7 +160,14 @@ class CodecTest {
             val next = source.next()
             if (next.isFailure) {
                 isEndStream = true
-                return Frame(trailers = mapOf(Status.GRPC_STATUS to Status.Code.INTERNAL.value.toString()))
+                return Frame(
+                    trailers =
+                        mapOf(
+                            Status.GRPC_STATUS to
+                                Status.Code.INTERNAL.value
+                                    .toString(),
+                        ),
+                )
             }
 
             val item = next.getOrThrow()
@@ -171,7 +178,14 @@ class CodecTest {
 
             if (maxMessageSize != null && payloadLen > maxMessageSize) {
                 isEndStream = true
-                return Frame(trailers = mapOf(Status.GRPC_STATUS to Status.Code.OUT_OF_RANGE.value.toString()))
+                return Frame(
+                    trailers =
+                        mapOf(
+                            Status.GRPC_STATUS to
+                                Status.Code.OUT_OF_RANGE.value
+                                    .toString(),
+                        ),
+                )
             }
 
             val frameBuf = EncodeBuf()
@@ -269,7 +283,12 @@ class CodecTest {
     @Test
     fun encodeTooBig() {
         // Upstream skips on windows due to 4GB allocation; we check status 8 on limit overflow
-        val trailers = mapOf(Status.GRPC_STATUS to Status.Code.RESOURCE_EXHAUSTED.value.toString())
+        val trailers =
+            mapOf(
+                Status.GRPC_STATUS to
+                    Status.Code.RESOURCE_EXHAUSTED.value
+                        .toString(),
+            )
         val frame = Frame(trailers = trailers)
         assertEquals("8", frame.trailers?.get(Status.GRPC_STATUS))
     }
