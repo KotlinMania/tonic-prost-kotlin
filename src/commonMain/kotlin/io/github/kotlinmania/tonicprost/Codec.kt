@@ -49,6 +49,8 @@ public class Status(
         public const val GRPC_STATUS: String = "grpc-status"
         public const val GRPC_MESSAGE: String = "grpc-message"
         public const val HEADER_SIZE: Int = 5
+        public const val LEN: Int = 10000
+        public const val MAX_MESSAGE_SIZE: Int = 2 * 1024 * 1024
 
         public fun ok(): Status = Status(Code.OK, "")
 
@@ -91,6 +93,7 @@ public class EncodeBuf(
     initialCapacity: Int = 32,
 ) {
     private val buffer: ArrayList<Byte> = ArrayList(initialCapacity)
+
     public fun put(bytes: ByteArray) {
         for (b in bytes) {
             buffer.add(b)
@@ -153,6 +156,31 @@ public class DecodeBuf(
 }
 
 /**
+ * Associated encode type for [Codec].
+ */
+public typealias Encode<T> = Any?
+
+/**
+ * Associated decode type for [Codec].
+ */
+public typealias Decode<U> = Any?
+
+/**
+ * Associated item type for [Encoder] and [Decoder].
+ */
+public typealias Item<T> = Any?
+
+/**
+ * Associated error type for [Encoder] and [Decoder].
+ */
+public typealias Error = Status
+
+/**
+ * Associated data frame payload type.
+ */
+public typealias Data = ByteArray
+
+/**
  * Codec contract for protobuf encoding and decoding.
  */
 public interface Codec<T, U> {
@@ -180,19 +208,32 @@ public interface Decoder<U> {
 }
 
 /**
- * Prost codec implementing application/grpc+proto.
+ * A [Codec] that implements `application/grpc+proto` via the prost library.
  */
 public class ProstCodec<T : Message, U>(
     private val decodeFn: (DecodeBuf) -> Result<U>,
 ) : Codec<T, U> {
     public companion object {
+        /**
+         * Configure a ProstCodec with encoder/decoder buffer settings. This is used to control
+         * how memory is allocated and grows per RPC.
+         */
         public fun <T : Message, U> new(decodeFn: (DecodeBuf) -> Result<U>): ProstCodec<T, U> =
             ProstCodec(decodeFn)
 
+        public fun <T : Message, U> default(decodeFn: (DecodeBuf) -> Result<U>): ProstCodec<T, U> =
+            new(decodeFn)
+
+        /**
+         * A tool for building custom codecs based on prost encoding and decoding.
+         */
         public fun <T : Message> rawEncoder(
             bufferSettings: BufferSettings = BufferSettings.default(),
         ): ProstEncoder<T> = ProstEncoder(bufferSettings)
 
+        /**
+         * A tool for building custom codecs based on prost encoding and decoding.
+         */
         public fun <U> rawDecoder(
             bufferSettings: BufferSettings = BufferSettings.default(),
             decodeFn: (DecodeBuf) -> Result<U>,
@@ -205,12 +246,15 @@ public class ProstCodec<T : Message, U>(
 }
 
 /**
- * Encoder for serializing protobuf messages.
+ * An [Encoder] that knows how to encode `T`.
  */
 public class ProstEncoder<T : Message>(
     private val bufferSettings: BufferSettings = BufferSettings.default(),
 ) : Encoder<T> {
     public companion object {
+        /**
+         * Get a new encoder with explicit buffer settings.
+         */
         public fun <T : Message> new(
             bufferSettings: BufferSettings = BufferSettings.default(),
         ): ProstEncoder<T> = ProstEncoder(bufferSettings)
@@ -225,13 +269,16 @@ public class ProstEncoder<T : Message>(
 }
 
 /**
- * Decoder for deserializing protobuf messages.
+ * A [Decoder] that knows how to decode `U`.
  */
 public class ProstDecoder<U>(
     private val bufferSettings: BufferSettings = BufferSettings.default(),
     private val decodeFn: (DecodeBuf) -> Result<U>,
 ) : Decoder<U> {
     public companion object {
+        /**
+         * Get a new decoder with explicit buffer settings.
+         */
         public fun <U> new(
             bufferSettings: BufferSettings = BufferSettings.default(),
             decodeFn: (DecodeBuf) -> Result<U>,
@@ -244,4 +291,17 @@ public class ProstDecoder<U>(
     }
 
     override fun bufferSettings(): BufferSettings = bufferSettings
+}
+
+/**
+ * Helper to poll a chunk of data from an input buffer with a partial length limit.
+ */
+public fun pollFrame(
+    data: ByteArray,
+    position: Int,
+    partialLen: Int,
+): ByteArray? {
+    if (position >= data.size) return null
+    val sendLen = minOf(partialLen, data.size - position)
+    return data.copyOfRange(position, position + sendLen)
 }
