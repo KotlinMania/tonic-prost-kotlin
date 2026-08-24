@@ -6,6 +6,11 @@ package io.github.kotlinmania.tonicprost
  *
  * This module provides the [ProstCodec], [ProstDecoder], and [ProstEncoder] for encoding
  * and decoding protobuf messages using the prost serialization model.
+ *
+ * Example:
+ * ```
+ * val codec = ProstCodec.new<Message, Message> { buf -> ... }
+ * ```
  */
 public object TonicProst {
     public const val MODULE_NAME: String = "tonic_prost"
