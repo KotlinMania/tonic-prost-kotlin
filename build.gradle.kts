@@ -530,6 +530,13 @@ mavenPublishing {
 // Tasks
 // ============================================================================
 
+tasks.register("test") {
+    group = "verification"
+    description = "Runs the commonTest-backed KMP suite, Android host tests, and Swift Export smoke test."
+    dependsOn("hostTests")
+    dependsOn("swiftExportSmokeTest")
+}
+
 tasks.register("setupAndroidSdk") {
     group = "setup"
     description = "Downloads and configures the project-local Android SDK. (Alias for ensureAndroidSdk)"
@@ -595,6 +602,7 @@ tasks.register("swiftExportSmokeTest") {
                 .asFile
         swiftBuildDirFile.deleteRecursively()
         val swiftBuildDir = swiftBuildDirFile.absolutePath
+        layout.buildDirectory.dir("bin/macosArm64/SwiftExportBinaryDebugStatic").get().asFile.mkdirs()
         execOperations
             .exec {
                 workingDir = projectDir
