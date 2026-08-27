@@ -301,7 +301,25 @@ public class MockBody(
     private val partialLen: Int = 0,
     private var count: Int = 0,
 ) {
-    public fun pollFrame(cx: Any? = null): Any? = cx
+    public fun pollFrame(cx: Any? = null): Result<ByteArray?>? {
+        val shouldSend = count % 2 == 0
+        val dataLen = data.size
+        if (dataLen > 0) {
+            val result =
+                if (shouldSend) {
+                    val sendLen = if (count == 0 && partialLen < dataLen) partialLen else dataLen
+                    val response = data.copyOfRange(0, sendLen)
+                    data = data.copyOfRange(sendLen, data.size)
+                    Result.success(response)
+                } else {
+                    null
+                }
+            count++
+            return result
+        }
+        return Result.success(null)
+    }
 }
 
 public fun fromDecodeError(error: Throwable): Status = Status.fromDecodeError(error)
+
