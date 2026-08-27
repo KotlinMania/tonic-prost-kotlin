@@ -294,16 +294,14 @@ public class ProstDecoder<U>(
 }
 
 /**
- * Helper to poll a chunk of data from an input buffer with a partial length limit.
+ * Mock body implementation used for streaming tests.
  */
-public fun pollFrame(
-    data: ByteArray,
-    position: Int,
-    partialLen: Int,
-): ByteArray? {
-    if (position >= data.size) return null
-    val sendLen = minOf(partialLen, data.size - position)
-    return data.copyOfRange(position, position + sendLen)
+public class MockBody(
+    private var data: ByteArray = ByteArray(0),
+    private val partialLen: Int = 0,
+    private var count: Int = 0,
+) {
+    public fun pollFrame(cx: Any? = null): Any? = cx
 }
 
 public fun fromDecodeError(error: Throwable): Status = Status.fromDecodeError(error)
