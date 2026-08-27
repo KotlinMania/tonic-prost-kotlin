@@ -24,4 +24,3 @@ public object TonicProst {
     public const val MODULE_NAME: String = "tonic_prost"
     public const val VERSION: String = "0.13.1"
 }
-
