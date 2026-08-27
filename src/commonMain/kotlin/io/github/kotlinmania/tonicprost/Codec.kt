@@ -305,3 +305,5 @@ public fun pollFrame(
     val sendLen = minOf(partialLen, data.size - position)
     return data.copyOfRange(position, position + sendLen)
 }
+
+public fun fromDecodeError(error: Throwable): Status = Status.fromDecodeError(error)
