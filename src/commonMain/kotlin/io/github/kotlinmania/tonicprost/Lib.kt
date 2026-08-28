@@ -3,12 +3,14 @@
  * Prost codec implementation for tonic.
  *
  * This crate provides the [ProstCodec] for encoding and decoding protobuf
- * messages using the [prost] library.
+ * messages using the prost serialization library.
  *
- * Example:
+ * # Example
+ *
  * ```kotlin
  * val codec = ProstCodec.new<Message, Message> { buf ->
  *     // decode protobuf message from buffer
+ *     Result.success(msg)
  * }
  * ```
  */
