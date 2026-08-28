@@ -294,6 +294,11 @@ public class ProstDecoder<U>(
 }
 
 /**
+ * Context placeholder for async polling waker interaction.
+ */
+public class Context(public val waker: Any? = null)
+
+/**
  * Mock body implementation used for streaming tests.
  */
 public class MockBody(
@@ -301,7 +306,7 @@ public class MockBody(
     private val partialLen: Int = 0,
     private var count: Int = 0,
 ) {
-    public fun pollFrame(cx: Any? = null): Result<ByteArray?>? {
+    public fun pollFrame(cx: Context? = null): Result<ByteArray?>? {
         val shouldSend = count % 2 == 0
         val dataLen = data.size
         if (dataLen > 0) {

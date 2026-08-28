@@ -282,15 +282,14 @@ class CodecTest {
 
     @Test
     fun encodeTooBig() {
-        // Upstream skips on windows due to 4GB allocation; we check status 8 on limit overflow
-        val trailers =
-            mapOf(
-                Status.GRPC_STATUS to
-                    Status.Code.RESOURCE_EXHAUSTED.value
-                        .toString(),
-            )
-        val frame = Frame(trailers = trailers)
-        assertEquals("8", frame.trailers?.get(Status.GRPC_STATUS))
+        val encoder = MockEncoder()
+        val msg = ByteArray(10)
+        val messages = listOf(Result.success(msg))
+        val body = EncodeBody(encoder, messages.iterator(), maxMessageSize = Long.MAX_VALUE)
+        val frame = body.frame()
+        assertNotNull(frame)
+        assertNotNull(frame.data)
+        assertEquals(Status.HEADER_SIZE + 10, frame.data.size)
     }
 
     @Test

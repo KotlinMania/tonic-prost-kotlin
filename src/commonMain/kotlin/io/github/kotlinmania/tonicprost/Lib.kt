@@ -3,7 +3,7 @@
  * Prost codec implementation for tonic.
  *
  * This crate provides the [ProstCodec] for encoding and decoding protobuf
- * messages using the prost serialization model.
+ * messages using the [prost] library.
  *
  * Example:
  * ```kotlin
@@ -21,6 +21,6 @@ package io.github.kotlinmania.tonicprost
  * and decoding protobuf messages using the prost serialization library.
  */
 public object TonicProst {
-    public const val MODULE_NAME: String = "tonic_prost"
+    public const val MODULE_NAME: String = "tonic-prost"
     public const val VERSION: String = "0.13.1"
 }
