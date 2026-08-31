@@ -8,10 +8,10 @@ Based on AST analysis, here are the concrete next steps.
 - **Function parity:** 13/14 matched (target 62) — 92.9%
 - **Class/type parity:** 13/13 matched (target 28) — 100.0%
 - **Combined symbol parity:** 26/27 matched (target 90) — 96.3%
-- **Average inline-code cosine:** 0.84 (function body across 2 matched files)
-- **Average documentation cosine:** 0.75 (doc text across 2 matched files)
-- **Cheat-zeroed Files:** 0
-- **Critical Issues:** 0 files with <0.60 function similarity
+- **Average inline-code cosine:** 0.67 (function body across 1 matched files)
+- **Average documentation cosine:** 0.70 (doc text across 1 matched files)
+- **Cheat-zeroed Files:** 1
+- **Critical Issues:** 1 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
 
@@ -27,7 +27,7 @@ No missing high-value files detected.
 
 Every matched file is listed below with function and type symbol parity.
 
-### 1. codec
+### 1. tonic-prost.codec
 
 - **Target:** `tonicprost.Codec`
 - **Similarity:** 0.67
@@ -39,12 +39,12 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 3/4 matched
 
-### 2. lib
+### 2. tonic-prost.lib
 
-- **Target:** `tonicprost.Lib`
-- **Similarity:** 1.00
+- **Target:** `tonicprost.Lib [STUB]`
+- **Similarity:** 0.00
 - **Dependents:** 0
-- **Priority Score:** 0.0
+- **Priority Score:** 10.0
 - **Functions:** 0/0 matched
 - **Missing functions:** _none_
 - **Types:** 0/0 matched (target 1)

@@ -1,4 +1,4 @@
-// port-lint: tests codec.rs
+// port-lint: tests tonic-prost/src/codec.rs
 package io.github.kotlinmania.tonicprost
 
 import kotlin.test.Test
