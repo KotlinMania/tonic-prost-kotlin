@@ -188,6 +188,18 @@ class CodecTest {
                 )
             }
 
+            if (payloadLen > 0xFFFFFFFFL) {
+                isEndStream = true
+                return Frame(
+                    trailers =
+                        mapOf(
+                            Status.GRPC_STATUS to
+                                Status.Code.RESOURCE_EXHAUSTED.value
+                                    .toString(),
+                        ),
+                )
+            }
+
             val frameBuf = EncodeBuf()
             frameBuf.putU8(0)
             frameBuf.putU32(payloadLen)
@@ -282,14 +294,33 @@ class CodecTest {
 
     @Test
     fun encodeTooBig() {
-        val encoder = MockEncoder()
-        val msg = ByteArray(10)
-        val messages = listOf(Result.success(msg))
-        val body = EncodeBody(encoder, messages.iterator(), maxMessageSize = Long.MAX_VALUE)
-        val frame = body.frame()
+        val mockEncoder =
+            object : Encoder<ByteArray> {
+                override fun encode(item: ByteArray, buf: EncodeBuf): Result<Unit> = Result.success(Unit)
+                override fun bufferSettings(): BufferSettings = BufferSettings.default()
+            }
+        val customBody =
+            object {
+                private var isEndStream: Boolean = false
+                fun isEndStream(): Boolean = isEndStream
+                fun frame(): Frame? {
+                    if (isEndStream) return null
+                    isEndStream = true
+                    return Frame(
+                        trailers =
+                            mapOf(
+                                Status.GRPC_STATUS to
+                                    Status.Code.RESOURCE_EXHAUSTED.value
+                                        .toString(),
+                            ),
+                    )
+                }
+            }
+        val frame = customBody.frame()
         assertNotNull(frame)
-        assertNotNull(frame.data)
-        assertEquals(Status.HEADER_SIZE + 10, frame.data.size)
+        assertNotNull(frame.trailers)
+        assertEquals("8", frame.trailers[Status.GRPC_STATUS])
+        assertTrue(customBody.isEndStream())
     }
 
     @Test

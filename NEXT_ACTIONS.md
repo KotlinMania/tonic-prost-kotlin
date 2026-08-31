@@ -5,10 +5,10 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 2/2 (100.0%)
-- **Function parity:** 13/14 matched (target 58) — 92.9%
+- **Function parity:** 13/14 matched (target 62) — 92.9%
 - **Class/type parity:** 13/13 matched (target 28) — 100.0%
-- **Combined symbol parity:** 26/27 matched (target 86) — 96.3%
-- **Average inline-code cosine:** 0.83 (function body across 2 matched files)
+- **Combined symbol parity:** 26/27 matched (target 90) — 96.3%
+- **Average inline-code cosine:** 0.84 (function body across 2 matched files)
 - **Average documentation cosine:** 0.75 (doc text across 2 matched files)
 - **Cheat-zeroed Files:** 0
 - **Critical Issues:** 0 files with <0.60 function similarity
@@ -30,10 +30,10 @@ Every matched file is listed below with function and type symbol parity.
 ### 1. codec
 
 - **Target:** `tonicprost.Codec`
-- **Similarity:** 0.66
+- **Similarity:** 0.67
 - **Dependents:** 0
-- **Priority Score:** 12703.4
-- **Functions:** 13/14 matched (target 58)
+- **Priority Score:** 12703.3
+- **Functions:** 13/14 matched (target 62)
 - **Missing functions:** `poll_frame`
 - **Types:** 13/13 matched (target 27)
 - **Missing types:** _none_
