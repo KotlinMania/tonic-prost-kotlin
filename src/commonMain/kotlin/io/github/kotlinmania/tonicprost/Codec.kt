@@ -1,4 +1,4 @@
-// port-lint: source src/codec.rs
+// port-lint: source codec.rs
 package io.github.kotlinmania.tonicprost
 
 /**
