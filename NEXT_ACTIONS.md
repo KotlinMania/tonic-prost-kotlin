@@ -29,7 +29,7 @@ Every matched file is listed below with function and type symbol parity.
 
 ### 1. codec
 
-- **Target:** `tonicprost.Codec [PROVENANCE-FALLBACK]`
+- **Target:** `tonicprost.Codec`
 - **Similarity:** 0.67
 - **Dependents:** 0
 - **Priority Score:** 12703.3
@@ -38,15 +38,10 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 13/13 matched (target 27)
 - **Missing types:** _none_
 - **Tests:** 3/4 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `codec.rs` vs expected `codec.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:codec.rs` vs expected `codec.rs`
-- **Proposed provenance header:** `// port-lint: source codec.rs` (current: `// port-lint: source codec.rs`)
-- **Proposed provenance header:** `// port-lint: tests codec.rs` (current: `// port-lint: tests codec.rs`)
-- **Lint issues:** 2
 
 ### 2. lib
 
-- **Target:** `tonicprost.Lib [PROVENANCE-FALLBACK]`
+- **Target:** `tonicprost.Lib`
 - **Similarity:** 1.00
 - **Dependents:** 0
 - **Priority Score:** 0.0
@@ -54,9 +49,6 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** _none_
 - **Types:** 0/0 matched (target 1)
 - **Missing types:** _none_
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `lib.rs` vs expected `lib.rs`
-- **Proposed provenance header:** `// port-lint: source lib.rs` (current: `// port-lint: source lib.rs`)
-- **Lint issues:** 1
 
 ## Success Criteria
 
