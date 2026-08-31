@@ -1,4 +1,4 @@
-// port-lint: source tonic-prost/src/lib.rs
+// port-lint: source src/lib.rs
 /**
  * Prost codec implementation for tonic.
  *
