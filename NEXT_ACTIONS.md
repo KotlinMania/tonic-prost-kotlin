@@ -27,7 +27,7 @@ No missing high-value files detected.
 
 Every matched file is listed below with function and type symbol parity.
 
-### 1. tonic-prost.codec
+### 1. codec
 
 - **Target:** `tonicprost.Codec`
 - **Similarity:** 0.67
@@ -39,7 +39,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** _none_
 - **Tests:** 3/4 matched
 
-### 2. tonic-prost.lib
+### 2. lib
 
 - **Target:** `tonicprost.Lib [STUB]`
 - **Similarity:** 0.00

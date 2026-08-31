@@ -2,7 +2,7 @@
   "type": "port",
   "name": "tonic-prost-kotlin",
   "source": {
-    "path": "tmp/tonic-prost/src",
+    "path": "tmp/tonic-prost",
     "lang": "rust"
   },
   "target": {
