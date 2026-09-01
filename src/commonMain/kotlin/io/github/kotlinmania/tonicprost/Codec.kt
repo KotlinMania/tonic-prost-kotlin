@@ -296,8 +296,29 @@ public class ProstDecoder<U>(
 /**
  * Context placeholder for async polling waker interaction.
  */
-public class Context(public val waker: Any? = null) {
+public class Context(
+    public val waker: Any? = null,
+) {
     public fun wake() {}
+}
+
+/**
+ * Frame container representing streamed data chunks or trailing metadata.
+ */
+public class Frame<T>(
+    public val data: T? = null,
+    public val trailers: Map<String, String>? = null,
+) {
+    public companion object {
+        public fun <T> data(data: T): Frame<T> = Frame(data = data)
+    }
+}
+
+/**
+ * Body interface for streaming gRPC payloads.
+ */
+public interface Body {
+    public fun pollFrame(cx: Context): Result<Frame<ByteArray>?>?
 }
 
 /**
@@ -307,8 +328,8 @@ public class MockBody(
     private var data: ByteArray = ByteArray(0),
     private val partialLen: Int = 0,
     private var count: Int = 0,
-) {
-    public fun pollFrame(cx: Context): Result<ByteArray?>? {
+) : Body {
+    override fun pollFrame(cx: Context): Result<Frame<ByteArray>?>? {
         val shouldSend = count % 2 == 0
         val dataLen = data.size
         val partialLen = partialLen
@@ -319,7 +340,7 @@ public class MockBody(
                     val sendLen = if (currentCount == 0 && partialLen < dataLen) partialLen else dataLen
                     val response = data.copyOfRange(0, sendLen)
                     data = data.copyOfRange(sendLen, data.size)
-                    Result.success(response)
+                    Result.success(Frame.data(response))
                 } else {
                     cx.wake()
                     null
@@ -332,4 +353,3 @@ public class MockBody(
 }
 
 public fun fromDecodeError(error: Throwable): Status = Status.fromDecodeError(error)
-
