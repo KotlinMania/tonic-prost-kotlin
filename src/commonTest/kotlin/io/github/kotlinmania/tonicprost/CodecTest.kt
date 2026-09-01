@@ -297,12 +297,15 @@ class CodecTest {
         val mockEncoder =
             object : Encoder<ByteArray> {
                 override fun encode(item: ByteArray, buf: EncodeBuf): Result<Unit> = Result.success(Unit)
+
                 override fun bufferSettings(): BufferSettings = BufferSettings.default()
             }
         val customBody =
             object {
                 private var isEndStream: Boolean = false
+
                 fun isEndStream(): Boolean = isEndStream
+
                 fun frame(): Frame? {
                     if (isEndStream) return null
                     isEndStream = true
