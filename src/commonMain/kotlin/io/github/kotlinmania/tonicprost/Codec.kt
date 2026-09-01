@@ -296,7 +296,9 @@ public class ProstDecoder<U>(
 /**
  * Context placeholder for async polling waker interaction.
  */
-public class Context(public val waker: Any? = null) {
+public class Context(
+    public val waker: Any? = null,
+) {
     public fun wake() {}
 }
 
