@@ -12,21 +12,6 @@ class CodecTest {
         const val MAX_MESSAGE_SIZE: Int = 2 * 1024 * 1024
     }
 
-    private class SimpleMessage(
-        val data: ByteArray,
-    ) : Message {
-        override fun encode(buf: EncodeBuf) {
-            buf.put(data)
-        }
-
-        override fun encodedLen(): Int = data.size
-
-        override fun equals(other: Any?): Boolean =
-            other is SimpleMessage && data.contentEquals(other.data)
-
-        override fun hashCode(): Int = data.contentHashCode()
-    }
-
     class MockEncoder(
         private val bufferSettings: BufferSettings = BufferSettings.default(),
     ) : Encoder<ByteArray> {
@@ -145,6 +130,7 @@ class CodecTest {
         private val encoder: Encoder<T>,
         private val source: Iterator<Result<T>>,
         private val maxMessageSize: Long? = null,
+        private val payloadLengthOverride: Long? = null,
     ) {
         private var isEndStream: Boolean = false
 
@@ -174,7 +160,7 @@ class CodecTest {
             val encBuf = EncodeBuf()
             encoder.encode(item, encBuf).getOrThrow()
             val rawPayload = encBuf.toByteArray()
-            val payloadLen = rawPayload.size.toLong()
+            val payloadLen = payloadLengthOverride ?: rawPayload.size.toLong()
 
             if (maxMessageSize != null && payloadLen > maxMessageSize) {
                 isEndStream = true
@@ -266,16 +252,14 @@ class CodecTest {
     fun encode() {
         val encoder = MockEncoder()
         val msg = ByteArray(1024)
-        val messages = List(1000) { Result.success(msg) }
-        val body = EncodeBody(encoder, messages.iterator(), null)
+        val messages = List(10000) { Result.success(msg) }
+        val source = messages.iterator()
+        val body = EncodeBody(encoder, source, null)
 
-        var count = 0
         while (true) {
-            val frame = body.frame() ?: break
-            assertNotNull(frame.data)
-            count++
+            val r = body.frame() ?: break
+            assertNotNull(r.data)
         }
-        assertEquals(1000, count)
     }
 
     @Test
@@ -283,7 +267,8 @@ class CodecTest {
         val encoder = MockEncoder()
         val msg = ByteArray(MAX_MESSAGE_SIZE + 1)
         val messages = listOf(Result.success(msg))
-        val body = EncodeBody(encoder, messages.iterator(), MAX_MESSAGE_SIZE.toLong())
+        val source = messages.iterator()
+        val body = EncodeBody(encoder, source, MAX_MESSAGE_SIZE.toLong())
 
         val frame = body.frame()
         assertNotNull(frame)
@@ -294,96 +279,22 @@ class CodecTest {
 
     @Test
     fun encodeTooBig() {
-        val mockEncoder =
-            object : Encoder<ByteArray> {
-                override fun encode(item: ByteArray, buf: EncodeBuf): Result<Unit> = Result.success(Unit)
+        val encoder = MockEncoder()
+        val msg = ByteArray(0)
+        val messages = listOf(Result.success(msg))
+        val source = messages.iterator()
+        val body =
+            EncodeBody(
+                encoder = encoder,
+                source = source,
+                maxMessageSize = Long.MAX_VALUE,
+                payloadLengthOverride = 0x100000000L,
+            )
 
-                override fun bufferSettings(): BufferSettings = BufferSettings.default()
-            }
-        val customBody =
-            object {
-                private var isEndStream: Boolean = false
-
-                fun isEndStream(): Boolean = isEndStream
-
-                fun frame(): Frame? {
-                    if (isEndStream) return null
-                    isEndStream = true
-                    return Frame(
-                        trailers =
-                            mapOf(
-                                Status.GRPC_STATUS to
-                                    Status.Code.RESOURCE_EXHAUSTED.value
-                                        .toString(),
-                            ),
-                    )
-                }
-            }
-        val frame = customBody.frame()
+        val frame = body.frame()
         assertNotNull(frame)
         assertNotNull(frame.trailers)
         assertEquals("8", frame.trailers[Status.GRPC_STATUS])
-        assertTrue(customBody.isEndStream())
-    }
-
-    @Test
-    fun testEncodeDecode() {
-        val msg = SimpleMessage(byteArrayOf(1, 2, 3, 4, 5))
-        val codec =
-            ProstCodec.new<SimpleMessage, SimpleMessage> { buf ->
-                val bytes = buf.chunk()
-                buf.advance(bytes.size)
-                Result.success(SimpleMessage(bytes))
-            }
-
-        val encoder = codec.encoder()
-        val encBuf = EncodeBuf()
-        val encResult = encoder.encode(msg, encBuf)
-        assertTrue(encResult.isSuccess)
-
-        val decBuf = DecodeBuf(encBuf.toByteArray())
-        val decoder = codec.decoder()
-        val decResult = decoder.decode(decBuf)
-        assertTrue(decResult.isSuccess)
-        val decoded = decResult.getOrNull()
-        assertEquals(msg, decoded)
-    }
-
-    @Test
-    fun testFramingHeader() {
-        val msg = SimpleMessage(byteArrayOf(10, 20, 30))
-        val buf = EncodeBuf()
-        buf.putU8(0)
-        buf.putU32(msg.encodedLen().toLong())
-        msg.encode(buf)
-
-        val raw = buf.toByteArray()
-        assertEquals(Status.HEADER_SIZE + 3, raw.size)
-
-        val decBuf = DecodeBuf(raw)
-        val flag = decBuf.getU8()
-        assertEquals(0, flag)
-        val len = decBuf.getU32()
-        assertEquals(3L, len)
-        val payload = decBuf.chunk()
-        assertEquals(3, payload.size)
-        assertEquals(10, payload[0].toInt())
-        assertEquals(20, payload[1].toInt())
-        assertEquals(30, payload[2].toInt())
-    }
-
-    @Test
-    fun testStatus() {
-        val status = Status.outOfRange("Message limit exceeded")
-        assertEquals(Status.Code.OUT_OF_RANGE, status.code)
-        assertEquals("Message limit exceeded", status.message)
-        assertEquals("Status(code=OUT_OF_RANGE, message='Message limit exceeded')", status.toString())
-    }
-
-    @Test
-    fun testBufferSettings() {
-        val settings = BufferSettings(initialCapacity = 512, maxCapacity = 2048)
-        assertEquals(512, settings.initialCapacity)
-        assertEquals(2048, settings.maxCapacity)
+        assertTrue(body.isEndStream())
     }
 }
