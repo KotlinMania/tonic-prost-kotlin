@@ -1,6 +1,6 @@
 # port-lint Proposed Changes
 
-**Generated:** 2026-09-02
+**Generated:** 2026-10-11
 **Source:** tmp/tonic-prost/src
 **Target:** src/commonMain/kotlin/io/github/kotlinmania/tonicprost
 
