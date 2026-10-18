@@ -1,9 +1,12 @@
 # port-lint Proposed Changes
 
-**Generated:** 2026-10-11
-**Source:** tmp/tonic-prost/src
+**Generated:** 2026-10-18
+**Source:** tmp/tonic-prost
 **Target:** src/commonMain/kotlin/io/github/kotlinmania/tonicprost
 
 These are review proposals only. They are emitted when a Rust -> Kotlin pair matches only after fallback normalization, so the existing `port-lint` header is not an exact provenance match.
 
-_No fallback provenance matches detected._
+| Target file | Current header | Proposed header | Source path | Reason |
+|-------------|----------------|-----------------|-------------|--------|
+| `src/commonMain/kotlin/io/github/kotlinmania/tonicprost/Codec.kt` | `// port-lint: source codec.rs` | `// port-lint: source codec.rs` | `codec.rs` | `port-lint provenance header matched only after fallback normalization: 'codec.rs' vs expected 'codec.rs'` |
+| `src/commonTest/kotlin/io/github/kotlinmania/tonicprost/CodecTest.kt` | `// port-lint: tests codec.rs` | `// port-lint: tests codec.rs` | `codec.rs` | `port-lint provenance header matched only after fallback normalization: 'tests:codec.rs' vs expected 'codec.rs'` |
